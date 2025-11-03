@@ -13,7 +13,7 @@ Các hệ thống SAN (Storage Area Network) và NAS (Network Attached Storage) 
 - Thiết kế không SPOF và khả năng tự động phục hồi (self-healing) ⇒ đảm bảo độ tin cậy cao.
 - Là giải pháp mã nguồn mở, Ceph không khóa người dùng vào một nhà cung cấp cụ thể và dễ dàng tùy chỉnh theo nhu cầu.
 - Đặc biệt, Ceph không yêu cầu phần cứng chuyên dụng (hardware-agnostic), hoạt động hiệu quả trên các thiết bị phổ thông, giảm chi phí đầu tư.
-<img src="images\theory\ceph-structure-1.png">
+<img src="images/theory/ceph-structure-1.png">
 
 Ceph cung cấp giải pháp lưu trữ thống nhất cho nhiều nhu cầu khác nhau. 
 
@@ -38,7 +38,7 @@ Trong Ceph, **dữ liệu được lưu trữ và truy cập theo một quy trì
 Mỗi **pool** bao gồm nhiều **Placement Group (PG)** — là các nhóm logic giúp Ceph phân tán và cân bằng dữ liệu. **Mỗi đối tượng chỉ thuộc về một PG duy nhất**, và **mỗi PG** lại được ánh xạ đến **một tập hợp OSD**, nơi dữ liệu thực tế được lưu trữ.
 Cơ chế này đảm bảo **phân tán dữ liệu, cân bằng tải, và khả năng chịu lỗi cao** trong toàn cụm Ceph.
 
-<img src="images\theory\ceph-workflow.png">
+<img src="images/theory/ceph-workflow.png">
 **Quy trình cụ thể như sau:**
 
 1. **Xác định đối tượng**: Mỗi đối tượng được xác định duy nhất bằng **tên đối tượng** và **ID của pool** (mỗi pool có một số ID). Ví dụ: Đối tượng "tree" trong pool "images" (ID = 7).
@@ -68,7 +68,7 @@ Kiến trúc đa lớp của Ceph được thiết kế để tách biệt các 
 - **Lớp Lưu trữ (Ceph Storage Cluster)**: Quản lý dữ liệu phân tán dựa trên nền tảng RADOS.
 - **Lớp phụ Storage Subsystem**: Lưu trữ dữ liệu thực tế trên phần cứng.
 
-<img src="images\theory\ceph-multi-layer-structure.png">
+<img src="/images/theory/ceph-multi-layer-structure.png">
 
 ### **1. Lớp dịch vụ Ceph** (Ceph Services)
 

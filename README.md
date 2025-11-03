@@ -10,4 +10,5 @@
 - `images/` : Hình ảnh minh họa 
 
 # Kiến thức cơ bản 
-## Tổng quan kiến trúc Ceph 
+## [Tổng quan kiến trúc Ceph](/docs/ceph-structure-overview.md)
+## [Các khái niệm cốt lõi của Ceph](/docs/ceph-core-concepts.md)
