@@ -10,6 +10,14 @@
 - `images/` : Hình ảnh minh họa 
 
 # Kiến thức cơ bản 
+## File system 
+### [Tổng quan về Filesystem](/docs/filesystem/01_overview_and_types.md)
+### [Cấu trúc và Tổ chức thư mục ](/docs/filesystem/02_structure_and_layout.md)
+### [Quản lý truy cập & thực thi](/docs/filesystem/03_access_control_and_fuse.md)
+### [Quản lý bộ nhớ & I/O trong File System](/docs/filesystem/04_memory_io_and_space_management.md)
+### [Hiệu năng & Phục hồi](/docs/filesystem/05_performance_and_recovery.md)
+
+# Ceph Storage
 ## [Tổng quan kiến trúc Ceph](/docs/ceph-structure-overview.md)
 ## [Các khái niệm cốt lõi của Ceph](/docs/ceph-core-concepts.md)
 
