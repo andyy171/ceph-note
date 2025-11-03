@@ -7,9 +7,7 @@ Ceph hỗ trợ ba loại lưu trữ chính, mỗi loại phục vụ mục đí
     Dữ liệu được lưu dưới dạng **đối tượng (objects)**, mỗi đối tượng là một "hộp" chứa dữ liệu và metadata (như kích thước, ngày tạo). Không có cấu trúc thư mục như hệ thống file thông thường. Dữ liệu được phân mảnh và sao chép để đảm bảo an toàn, phù hợp cho dữ liệu lớn như ảnh, video trên cloud (hỗ trợ S3 API).
     
     <aside>
-    ❕
-    
-     Chỉ đọc/ghi toàn bộ object, không hỗ trợ truy cập ngẫu nhiên.
+    ❕Chỉ đọc/ghi toàn bộ object, không hỗ trợ truy cập ngẫu nhiên.
     
     </aside>
     
@@ -18,9 +16,7 @@ Ceph hỗ trợ ba loại lưu trữ chính, mỗi loại phục vụ mục đí
     Dữ liệu được chia thành các **khối (blocks)** cố định (như 4KB), hoạt động như ổ cứng ảo. Sử dụng RBD (RADOS Block Device) images, có thể mount như ổ đĩa cho máy ảo (VM). Dữ liệu được phân tán qua cluster để chịu lỗi. 
     
     <aside>
-    ❕
-    
-    Tối ưu cho ứng dụng cần truy cập ngẫu nhiên (như database), khác với object vì không có metadata phong phú.
+    ❕Tối ưu cho ứng dụng cần truy cập ngẫu nhiên (như database), khác với object vì không có metadata phong phú.
     
     </aside>
     
@@ -29,9 +25,7 @@ Ceph hỗ trợ ba loại lưu trữ chính, mỗi loại phục vụ mục đí
     Cung cấp hệ thống file với cấu trúc thư mục và file, tương tự ext4. Sử dụng CephFS, dữ liệu file được phân mảnh thành objects, metadata được quản lý bởi MDS (Metadata Server). 
     
     <aside>
-    ❕
-    
-    Hỗ trợ cấu trúc cây thư mục, phù hợp cho chia sẻ file nhóm, phức tạp hơn block do cần quản lý metadata.
+    ❕Hỗ trợ cấu trúc cây thư mục, phù hợp cho chia sẻ file nhóm, phức tạp hơn block do cần quản lý metadata.
     
     </aside>
 

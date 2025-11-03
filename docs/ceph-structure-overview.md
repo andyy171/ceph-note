@@ -13,7 +13,7 @@ Các hệ thống SAN (Storage Area Network) và NAS (Network Attached Storage) 
 - Thiết kế không SPOF và khả năng tự động phục hồi (self-healing) ⇒ đảm bảo độ tin cậy cao.
 - Là giải pháp mã nguồn mở, Ceph không khóa người dùng vào một nhà cung cấp cụ thể và dễ dàng tùy chỉnh theo nhu cầu.
 - Đặc biệt, Ceph không yêu cầu phần cứng chuyên dụng (hardware-agnostic), hoạt động hiệu quả trên các thiết bị phổ thông, giảm chi phí đầu tư.
-<img src="images/theory/ceph-structure-1.png">
+<img src="/images/theory/ceph-structure-1.png">
 
 Ceph cung cấp giải pháp lưu trữ thống nhất cho nhiều nhu cầu khác nhau. 
 
@@ -38,7 +38,7 @@ Trong Ceph, **dữ liệu được lưu trữ và truy cập theo một quy trì
 Mỗi **pool** bao gồm nhiều **Placement Group (PG)** — là các nhóm logic giúp Ceph phân tán và cân bằng dữ liệu. **Mỗi đối tượng chỉ thuộc về một PG duy nhất**, và **mỗi PG** lại được ánh xạ đến **một tập hợp OSD**, nơi dữ liệu thực tế được lưu trữ.
 Cơ chế này đảm bảo **phân tán dữ liệu, cân bằng tải, và khả năng chịu lỗi cao** trong toàn cụm Ceph.
 
-<img src="images/theory/ceph-workflow.png">
+<img src="/images/theory/ceph-workflow.png">
 **Quy trình cụ thể như sau:**
 
 1. **Xác định đối tượng**: Mỗi đối tượng được xác định duy nhất bằng **tên đối tượng** và **ID của pool** (mỗi pool có một số ID). Ví dụ: Đối tượng "tree" trong pool "images" (ID = 7).
@@ -79,9 +79,7 @@ Lớp này cung cấp các giao diện để ứng dụng và người dùng tru
 - **CephFS (Ceph File System)**: Cung cấp hệ thống tệp phân tán tuân thủ POSIX, hỗ trợ truy cập đồng thời từ nhiều máy khách, lý tưởng cho shared storage.
 
 <aside>
-❕
-
-Lớp này cho phép Ceph tích hợp với các môi trường như OpenStack (RBD), Kubernetes (CephFS), hoặc lưu trữ object cho ứng dụng web (RGW).
+❕Lớp này cho phép Ceph tích hợp với các môi trường như OpenStack (RBD), Kubernetes (CephFS), hoặc lưu trữ object cho ứng dụng web (RGW).
 
 </aside>
 
@@ -96,9 +94,7 @@ Lớp này là trung tâm của Ceph, dựa trên nền tảng **RADOS (Reliable
 - **MDS (Metadata Server)**: Quản lý siêu dữ liệu cho CephFS, tăng tốc độ truy cập tệp trong hệ thống file.
 
 <aside>
-❕
-
-Lớp này đảm bảo Ceph tự động hóa (self-healing, self-managing) và mở rộng khi thêm thiết bị hoặc node.
+❕Lớp này đảm bảo Ceph tự động hóa (self-healing, self-managing) và mở rộng khi thêm thiết bị hoặc node.
 
 </aside>
 

@@ -12,3 +12,7 @@
 # Kiến thức cơ bản 
 ## [Tổng quan kiến trúc Ceph](/docs/ceph-structure-overview.md)
 ## [Các khái niệm cốt lõi của Ceph](/docs/ceph-core-concepts.md)
+
+
+# Labs 
+## [Triển khai Ceph 4-node](/labs/ceph-4-node-setup.md)
