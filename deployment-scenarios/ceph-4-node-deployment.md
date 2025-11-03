@@ -5,7 +5,7 @@
 > 
 > Cụm này được thiết kế nhằm mục tiêu **thực hành và kiểm thử** các dịch vụ chính của Ceph bao gồm **MON, MGR, OSD, MDS, RGW và Grafana**, trong phạm vi **môi trường lab nội bộ**.
 > 
-> Tất cả node có cấu hình tương đồng (2 vCPU, 6GB RAM, 1 SSD 40GB, 1 HDD 60GB) và được kết nối trong cùng mạng nội bộ **192.168.56.0/24**.
+> Tất cả node có cấu hình tương đồng (2 vCPU, 6GB RAM, 1 SSD 40GB, 1 HDD 60GB) và được kết nối trong cùng mạng nội bộ **192.168.xx.0/24**.
 >
 
 <img src="/images/deployment/ceph 4-node cluster/ceph 4-node cluster.png">
@@ -24,7 +24,7 @@
 | **Hostname** | **Giao diện** | **Kiểu mạng** | **Địa chỉ IP** | **Mục đích sử dụng** |
 | --- | --- | --- | --- | --- |
 | ceph-node01–04 | eth0 | NAT | DHCP | Truy cập Internet, tải container images, cập nhật hệ thống |
-| ceph-node01–04 | eth1 | Host-only | 192.168.56.0/24 | Mạng Ceph dùng chung cho public & cluster traffic |
+| ceph-node01–04 | eth1 | Host-only | 192.168.xx.0/24 | Mạng Ceph dùng chung cho public & cluster traffic |
 
 # Các bước triển khai 
 ## Cấu hình hostname của các node
@@ -36,17 +36,17 @@ sudo hostnamectl set-hostname ceph-node04  # trên node04
 
 # Cập nhật /etc/hosts
 sudo tee -a /etc/hosts << EOF
-192.168.56.101 ceph-node01
-192.168.56.102 ceph-node02
-192.168.56.103 ceph-node03
-192.168.56.104 ceph-node04
+192.168.xx.101 ceph-node01
+192.168.xx.102 ceph-node02
+192.168.xx.103 ceph-node03
+192.168.xx.104 ceph-node04
 EOF
 
 # Kiểm tra hostname
 hostname -f
 
 ```
-<img src="/images\deployment\ceph 4-node cluster\hostname-setup.png">
+<img src="/images/deployment/ceph 4-node cluster/hostname-setup.png">
 
 ## Cấu hình IP trên các node 
 
@@ -58,7 +58,7 @@ sudo nano /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
 ## Thêm nội dung 
 network: {config: disabled}
 ```
-<img src="/images\deployment\ceph 4-node cluster\disable-cloud-init.png">
+<img src="/images/deployment/ceph 4-node cluster/disable-cloud-init.png">
 
 **Xóa cấu hình mạng cũ**: Loại bỏ các file mạng do cloud-init hoặc hệ thống tạo ra trước đó.
 
@@ -68,10 +68,10 @@ sudo rm -f /etc/netplan/50-cloud-init.yaml
 sudo rm -f /etc/netplan/90-installer-network.yaml
 sudo cloud-init clean --logs
 ```
-<img src="/images\deployment\ceph 4-node cluster\remove-cloud-init-setup.png">
+<img src="/images/deployment/ceph 4-node cluster/remove-cloud-init-setup.png">
 
 Tạo cấu hình Netplan mới
-<img src="/images\deployment\ceph 4-node cluster\check-network-address.png">
+<img src="/images/deployment/ceph 4-node cluster/check-network-address.png">
 
 ```bash
 ## Tạo lại file `01-netcfg.yaml` mới trong `/etc/netplan/`
@@ -87,7 +87,7 @@ network:
     ens34:       # NIC2: Host-only (Cluster network)
       dhcp4: no
       addresses:
-        - 192.168.56.101/24
+        - 192.168.xx.101/24
       nameservers:
         addresses:
           - 8.8.8.8
@@ -104,21 +104,21 @@ sudo chown root:root /etc/netplan/01-netcfg.yaml
 sudo netplan generate
 sudo netplan apply
 ```
-<img src="/images\deployment\ceph 4-node cluster\approved-config.png">
+<img src="/images/deployment/ceph 4-node cluster/approved-config.png">
 
 **Kiểm tra kết nối đến các máy khác trong mạng :**
 ```bash
 # Sau thay đổi thì ping lại các node với nhau
 ping -c2 ceph-node0
 ```
-<img src="/images\deployment\ceph 4-node cluster\node-to-node-ping.png">
+<img src="/images/deployment/ceph 4-node cluster/node-to-node-ping.png">
 
 ## Thêm ổ đĩa và tắt swap 
 - Thêm ổ đĩa thứ 2 trên các VMs sau đó reboot
 - Ping các VMs sau khi reboot để đảm bảo các cấu hình network không bị đặt lại sau khi reboot
 - Tắt swap và kiểm tra xem disk đã nhận chưa rồi tẩy sạch disk 
 
-<img src="/images\deployment\ceph 4-node cluster\disk-added-check.png">
+<img src="/images/deployment/ceph 4-node cluster/disk-added-check.png">
 
 ## Cài đặt các package 
 
@@ -185,10 +185,10 @@ sudo ufw allow 3300/tcp comment 'Ceph MON quorum'
 sudo ufw allow 9100/tcp comment 'Node exporter metrics (nếu dùng Prometheus)'
 
 # Cluster network 
-sudo ufw allow from 192.168.56.0/24 comment 'Cluster network traffic'
+sudo ufw allow from 192.168.xx.0/24 comment 'Cluster network traffic'
 
 # Cephadm SSH (quản lý container)
-sudo ufw allow from 192.168.56.0/24 to any port 22 proto tcp comment 'Cephadm SSH internal'
+sudo ufw allow from 192.168.xx.0/24 to any port 22 proto tcp comment 'Cephadm SSH internal'
 
 # Enable và kiểm tra
 sudo ufw enable
@@ -259,12 +259,12 @@ sudo apt update
 sudo apt install -y cephadm
 
 # Bootstrap với các tuỳ chọn an toàn
-sudo cephadm bootstrap \
-    --mon-ip 192.168.56.101 \
-    --initial-dashboard-user admin \
-    --initial-dashboard-password admin123 \
-    --allow-fqdn-hostname \
-    --cluster-network 192.168.56.0/24
+sudo cephadm bootstrap /
+    --mon-ip 192.168.xx.101 /
+    --initial-dashboard-user admin /
+    --initial-dashboard-password admin123 /
+    --allow-fqdn-hostname /
+    --cluster-network 192.168.xx.0/24
 
 ## Thêm alias 
 echo "alias ceph='sudo cephadm shell -- ceph'" >> ~/.bashrc
@@ -279,7 +279,7 @@ ceph status
 ceph orch host ls
 
 # Cấu hình mạng public
-ceph config set global public_network 192.168.56.0/24
+ceph config set global public_network 192.168.xx.0/24
 
 # Kết nối các node
 ceph cephadm get-pub-key > /tmp/ceph.pub
@@ -293,9 +293,9 @@ ssh root@ceph-node03 hostname
 ssh root@ceph-node04 hostname
 
 # Thêm các node vào cluster
-ceph orch host add ceph-node02 192.168.56.102
-ceph orch host add ceph-node03 192.168.56.103  
-ceph orch host add ceph-node04 192.168.56.104
+ceph orch host add ceph-node02 192.168.xx.102
+ceph orch host add ceph-node03 192.168.xx.103  
+ceph orch host add ceph-node04 192.168.xx.104
 
 # Kiểm tra tổng thể
 ceph orch host ls
@@ -356,5 +356,6 @@ ceph orch host ls
 <img src="/images/deployment/ceph 4-node cluster/ceph-dashboard-1.png">
 
 <img src="/images/deployment/ceph 4-node cluster/ceph-dashboard-2.png">
+
 
 

@@ -276,6 +276,7 @@ ceph config set global mon_warn_on_insecure_global_id_reclaim false
 ceph config set global mon_warn_on_insecure_global_id_reclaim_allowed false
 ```
 
+
 ## Triển khai dịch vụ Ceph 
 
 ### MON
