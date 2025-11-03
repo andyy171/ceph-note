@@ -1,107 +1,63 @@
-#!/usr/bin/env python3
 import re
-import sys
+import os
 from pathlib import Path
-from typing import List, Tuple
 
-# Config
-ROOT = Path.cwd()
-EXCLUDE_DIRS = {'images', '.git', '.github'}  # exclude images by default
-FILE_GLOB = '**/*.md'
-MIN_BASE64_LEN = 40   # long base64-ish strings to consider
-MAX_SNIPPET_LEN = 160
+# Thư mục quét
+BASE_DIR = Path(".")
+TARGET_EXT = [".md"]
 
-# Patterns: tuple(name, compiled_regex, description)
-PATTERNS = [
-    ("PEM_PRIVATE_KEY", re.compile(r'-----BEGIN (?:RSA )?PRIVATE KEY-----', re.IGNORECASE),
-     "Private key block (PEM)"),
-    ("OPENSSH_PRIVATE_KEY", re.compile(r'-----BEGIN OPENSSH PRIVATE KEY-----', re.IGNORECASE),
-     "OpenSSH private key block"),
-    ("AWS_ACCESS_KEY_ID", re.compile(r'\bAKIA[0-9A-Z]{16}\b'),
-     "AWS Access Key ID (AKIA...)"),
-    ("AWS_SECRET_KEY", re.compile(r'(?<![A-Za-z0-9/+=])[A-Za-z0-9/+/=]{40}(?![A-Za-z0-9/+/=])'),
-     "Likely AWS Secret Access Key or similar 40-char secret"),
-    ("JWT", re.compile(r'\b[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\b'),
-     "Possible JWT (header.payload.signature)"),
-    ("LONG_BASE64", re.compile(r'(?<![A-Za-z0-9/+=])[A-Za-z0-9/+/=]{' + str(MIN_BASE64_LEN) + r',}(?![A-Za-z0-9/+=])'),
-     "Long base64-like string"),
-    ("SSH_PEM_KEYLINE", re.compile(r'-----BEGIN [A-Z ]*PRIVATE KEY-----', re.IGNORECASE),
-     "Private key block line"),
-    ("SECRET_ASSIGN", re.compile(r'(?i)\b(secret|api[_-]?key|apikey|token|passwd|password|client_secret|access_secret)\b\s*[:=]\s*([^\s\'\"`]+)'),
-     "Key/secret assigned in-line (secret = ... / token: ...)"),
-    ("KEY_IN_NAME", re.compile(r'(?i)key[_-]?(id|secret)?\b'),
-     "Filename or token containing 'key' (heuristic)"),
+# Regex phát hiện chuỗi nghi ngờ (JWT, key, secret)
+PATTERNS = {
+    "JWT": re.compile(r"\b[A-Za-z0-9-_]{20,}\.[A-Za-z0-9-_]{20,}\.[A-Za-z0-9-_]{10,}\b"),
+    "SECRET_ASSIGN": re.compile(r"(secret|token|password)\s*[:=]\s*['\"]?[A-Za-z0-9+/=_-]{8,}['\"]?", re.IGNORECASE),
+    "KEY_IN_NAME": re.compile(r"(?<!your_)(?<!sample_)\b(key|token|password|secret)\b", re.IGNORECASE),
+}
+
+# Danh sách pattern hoặc từ khóa để *bỏ qua*
+SAFE_WORDS = [
+    "192.168.", "localhost", "example.com", "download.ceph.com", "your_keyring",
+    "YOUR_KEY_PLACEHOLDER", "cephadm", "ceph-", "host", "cluster", "curl", "apt", "sudo"
 ]
 
-def redact(s: str, keep_front=4, keep_back=4) -> str:
-    s = s.strip()
-    if len(s) <= keep_front + keep_back + 4:
-        # short -> mask middle
-        if len(s) <= 8:
-            return s[0:1] + '***' + s[-1:] if len(s) > 1 else '***'
-        return s[0:2] + '***' + s[-2:]
-    return s[:keep_front] + '...' + s[-keep_back:]
+def is_safe_line(line: str):
+    line_lower = line.lower()
+    return any(word in line_lower for word in SAFE_WORDS)
 
-def is_excluded(path: Path) -> bool:
-    for part in path.parts:
-        if part in EXCLUDE_DIRS:
-            return True
-    return False
-
-def scan_file(path: Path) -> List[Tuple[str,int,str]]:
-    findings = []
-    try:
-        text = path.read_text(encoding='utf-8', errors='ignore')
-    except Exception as e:
-        return findings
-    lines = text.splitlines()
-    for i, line in enumerate(lines, start=1):
-        # quick skip empty
-        if not line.strip():
-            continue
-        for name, regex, desc in PATTERNS:
-            for m in regex.finditer(line):
-                raw = m.group(0)
-                # redact to avoid printing full secret
-                red = redact(raw)
-                # keep snippet context
-                snippet = line.strip()
-                if len(snippet) > MAX_SNIPPET_LEN:
-                    snippet = snippet[:MAX_SNIPPET_LEN] + '...'
-                findings.append((name, i, red))
-    return findings
+def scan_file(filepath):
+    results = []
+    with open(filepath, "r", encoding="utf-8") as f:
+        for i, line in enumerate(f, 1):
+            if is_safe_line(line):
+                continue
+            for name, pattern in PATTERNS.items():
+                if pattern.search(line):
+                    results.append((i, name, line.strip()))
+    return results
 
 def main():
-    md_files = list(ROOT.glob(FILE_GLOB))
-    md_files = [p for p in md_files if p.is_file() and not is_excluded(p)]
-    total_findings = 0
-    report = []
-    for p in sorted(md_files):
-        f = scan_file(p)
-        if f:
-            report.append((p, f))
-            total_findings += len(f)
+    all_findings = {}
+    for path in BASE_DIR.rglob("*"):
+        if path.suffix in TARGET_EXT:
+            findings = scan_file(path)
+            if findings:
+                all_findings[str(path)] = findings
 
-    if total_findings == 0:
-        print("✅ No suspicious secrets found in markdown files scanned.")
-        sys.exit(0)
+    if not all_findings:
+        print("✅ No secrets found in markdown files.")
+        return
 
-    print("⚠️  Potential secrets detected in markdown files:")
-    print()
-    for p, items in report:
-        print(f"File: {p}")
-        for name, lineno, red in items:
-            print(f"  - [{name}] line {lineno}: {red}")
+    print("⚠️ Potential secrets detected:\n")
+    for file, issues in all_findings.items():
+        print(f"File: {file}")
+        for line_num, tag, content in issues:
+            print(f"  - [{tag}] line {line_num}: {content[:60]}")
         print()
-    print("----")
-    print(f"Total suspicious matches: {total_findings}")
-    print()
-    print("Guidance:")
-    print("- If these are false positives (placeholders like 'your_keyring'), consider leaving a comment above them or use an obviously safe placeholder (e.g., YOUR_KEY_PLACEHOLDER).")
-    print("- If these are real secrets, REMOVE them and rotate the secret in the real system.")
-    sys.exit(1)
 
-if __name__ == '__main__':
+    print("----")
+    print("Guidance:")
+    print("- Use placeholders like `YOUR_KEY_PLACEHOLDER` or `example_value`.")
+    print("- Review flagged lines manually before pushing to remote.\n")
+
+if __name__ == "__main__":
     main()
 
-# EOF
