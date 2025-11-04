@@ -262,6 +262,15 @@ Cách thức:
 
 ### So sánh với Replication và RAID
 
+| Đặc điểm | Replication | RAID | Erasure Coding |
+|---------|-------------|------|----------------|
+| **Chi phí lưu trữ** | Cao (3x dung lượng) | Trung bình | Thấp (1.5x dung lượng) |
+| **Khả năng chịu lỗi** | Phụ thuộc số bản sao | RAID 5: 1 lỗi, RAID 6: 2 lỗi | Linh hoạt, cấu hình được |
+| **Hiệu năng khôi phục** | Nhanh | Chậm | Nhanh hơn RAID |
+| **Kiến trúc** | Phần mềm, đơn giản | Phụ thuộc phần cứng | Phần mềm, phân tán |
+| **Khả năng mở rộng** | Hạn chế | Rất hạn chế | Rất tốt |
+| **Tính phù hợp** | Dữ liệu nóng, performance cao | Server đơn lẻ | Dữ liệu lớn, cold storage |
+
 ### Cấu hình & Sử dụng trong Ceph
 
 Tạo một Erasure Coded Pool
