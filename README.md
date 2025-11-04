@@ -10,17 +10,18 @@
 - `images/` : Hình ảnh minh họa 
 
 <details>
-<summary> # Kiến thức cơ bản </summary>
+<summary> Kiến thức cơ bản </summary>
 
 <details>
-<summary> ## Storage </summary>
+<summary> Storage </summary>
 
 ### [Tổng quan về Storage](/docs/storage/01_overview.md)
 </details>
 
 <details>
 
-## File system 
+<summary> File system </summary>
+
 ### [Tổng quan về Filesystem](https://github.com/andyy171/sys-oops-pewpew/blob/cb1506297c9e98ce866f8e623f934472a0d92d61/filesystem/01_overview_and_types.md)
 ### [Cấu trúc và Tổ chức thư mục ](https://github.com/andyy171/sys-oops-pewpew/blob/cb1506297c9e98ce866f8e623f934472a0d92d61/filesystem/02_structure_and_layout.md)
 ### [Quản lý truy cập & thực thi](https://github.com/andyy171/sys-oops-pewpew/blob/cb1506297c9e98ce866f8e623f934472a0d92d61/filesystem/03_access_control_and_fuse.md)
@@ -30,9 +31,10 @@
 </details>
 
 # Ceph Storage
-## [Tổng quan kiến trúc Ceph](/docs/ceph/ceph-structure-overview.md)
-## [Các khái niệm cốt lõi của Ceph](/docs/ceph/ceph-core-concepts.md)
-
+## [Tổng quan kiến trúc Ceph](/docs/ceph/01-ceph-structure-overview.md)
+## [Các khái niệm cốt lõi của Ceph](/docs/ceph/02-ceph-core-concepts.md)
+## [Các lưu ý khi xây dựng Ceph Storage](/docs/ceph/03-ceph-planning-notes.md)
+## [Các câu lệnh Ceph thông dụng](/docs/ceph/04-ceph-common-commands.md)
 
 # Labs 
 ## [Triển khai Ceph 4-node](/labs/ceph-4-node-setup.md)
