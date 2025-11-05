@@ -35,6 +35,7 @@
 ## [Các khái niệm cốt lõi của Ceph](/docs/ceph/02-ceph-core-concepts.md)
 ## [Các lưu ý khi xây dựng Ceph Storage](/docs/ceph/03-ceph-planning-notes.md)
 ## [Các câu lệnh Ceph thông dụng](/docs/ceph/04-ceph-common-commands.md)
+## [NVMe-oF với Ceph](/docs/ceph/13-ceph-nvme-of.md)
 
 # Labs 
 ## [Triển khai Ceph 4-node](/labs/ceph-4-node-setup.md)
